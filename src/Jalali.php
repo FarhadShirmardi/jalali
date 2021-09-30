@@ -34,7 +34,7 @@ class Jalali extends Carbon
         [$year, $month, $day] = explode('-', self::normalizeDate($datetime[0]));
         try {
             $time = $datetime[1];
-        } catch (Exception $e) {
+        } catch (Exception) {
             $time = null;
         }
 
