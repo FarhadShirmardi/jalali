@@ -1,0 +1,11 @@
+/composer.lock
+/vendor/
+/composer.phar
+/.phpunit.result.cache
+/.idea/inspectionProfiles/
+/.idea/Jalali.iml
+/.idea/php.xml
+/.idea/php-test-framework.xml
+/.idea/vcs.xml
+/.idea/modules.xml
+/.idea/
