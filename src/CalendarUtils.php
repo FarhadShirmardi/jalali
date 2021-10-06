@@ -153,4 +153,10 @@ class CalendarUtils
         }
         return '';
     }
+
+    public static function checkdate($year, $month, $day): bool
+    {
+        return $year >= 1 and $month >= 1 and $month <= 12
+            and $day >= 1 and $day <= self::getDayCount($year, $month);
+    }
 }
