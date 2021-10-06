@@ -13,7 +13,7 @@ class Jalali extends Carbon
     public int $jMonth;
     public int $jDay;
 
-    public static function parseJalali(string $datetime, $format = 'Y/m/d H:i:s'): Jalali
+    public static function parseJalali(string $datetime, $format = 'Y/m/d'): Jalali
     {
         [$year, $month, $day, $time] = self::parseFromFormat($datetime, $format);
         [$gYear, $gMonth, $gDay] = CalendarUtils::j2g($year, $month, $day);
