@@ -10,12 +10,12 @@ class JalaliRule implements Rule
 {
     private string $format;
 
-    public function __construct($format = 'Y/m/d')
+    public function __construct(string $format = 'Y/m/d')
     {
         $this->format = $format;
     }
 
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
         if (!is_string($value)) {
             return false;

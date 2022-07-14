@@ -4,8 +4,6 @@ namespace Derakht\Jalali;
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
-use Exception;
-
 
 class Jalali extends Carbon
 {
@@ -13,7 +11,7 @@ class Jalali extends Carbon
     public int $jMonth;
     public int $jDay;
 
-    public static function parseJalali(string $datetime, $format = 'Y/m/d'): Jalali
+    public static function parseJalali(string $datetime, ?string $format = null): Jalali
     {
         [$year, $month, $day, $time] = self::parseFromFormat($datetime, $format);
         [$gYear, $gMonth, $gDay] = CalendarUtils::j2g($year, $month, $day);
@@ -29,8 +27,11 @@ class Jalali extends Carbon
             ->setDate($gYear, $gMonth, $gDay)->setTimeFrom($time);
     }
 
-    public static function parseFromFormat($date, $format): array
+    public static function parseFromFormat(string $date, ?string $format = null): array
     {
+        if (empty($format)) {
+            return static::guessFormat($date);
+        }
         $keys = [
             'Y' => ['year', '\d{4}'],
             'y' => ['year', '\d{2}'],
@@ -57,7 +58,7 @@ class Jalali extends Carbon
         foreach ($chars as $n => $char) {
             $lastChar = $chars[$n - 1] ?? '';
             $skipCurrent = '\\' == $lastChar;
-            if (!$skipCurrent && isset($keys[$char])) {
+            if (! $skipCurrent && isset($keys[$char])) {
                 $regex .= '(?P<' . $keys[$char][0] . '>' . $keys[$char][1] . ')';
             } else {
                 if ('\\' == $char) {
@@ -79,12 +80,12 @@ class Jalali extends Carbon
             }
         }
 
-        if (!$matched or !CalendarUtils::checkdate($dt['year'], $dt['month'], $dt['day'])) {
+        if (! $matched or ! CalendarUtils::checkDate($dt['year'], $dt['month'], $dt['day'])) {
             throw new InvalidFormatException('Invalid date format!');
         }
 
         if (strlen($dt['year']) == 2) {
-            $dt['year'] = substr(self::now()->jYear, 0, 2) . $dt['year'];
+            $dt['year'] = substr((string)self::now()->jYear, 0, 2) . $dt['year'];
         }
 
         $year = isset($dt['year']) ? (int)$dt['year'] : 0;
@@ -98,7 +99,7 @@ class Jalali extends Carbon
         return [$year, $month, $day, (new self)->setTime($hour, $minute, $second)->toTimeString()];
     }
 
-    public function setJalaliDate($jYear, $jMonth, $jDay): Jalali
+    public function setJalaliDate(int|string $jYear, int|string $jMonth, int|string $jDay): Jalali
     {
         $this->jYear = (int)$jYear;
         $this->jMonth = (int)$jMonth;
@@ -109,28 +110,41 @@ class Jalali extends Carbon
         return $this;
     }
 
-    private function updateGregorian()
+    private function updateGregorian(): void
     {
         [$gYear, $gMonth, $gDay] = CalendarUtils::j2g($this->jYear, $this->jMonth, $this->jDay);
         $this->setDate($gYear, $gMonth, $gDay);
     }
 
-    private static function extractParts(string $datetime): array
+    protected static function guessFormat(string $date): array
     {
-        $datetime = explode(' ', $datetime);
-        [$year, $month, $day] = explode('-', self::normalizeDate($datetime[0]));
-        try {
-            $time = $datetime[1];
-        } catch (Exception) {
-            $time = null;
+        $dateCollection = collect([
+            '',
+            'Y/m/d',
+            'Y-m-d',
+        ]);
+
+        $timeCollection = collect([
+            '',
+            'H',
+            'H:i',
+            'H:i:s',
+        ]);
+
+        $formats = $dateCollection
+            ->crossJoin([' '], $timeCollection)
+            ->map(fn($item) => trim(implode('', $item)))
+            ->filter(fn($item) => $item !== '')
+            ->sortByDesc(fn($item) => strlen($item));
+        foreach ($formats as $format) {
+            try {
+                return self::parseFromFormat($date, $format);
+            } catch (InvalidFormatException) {
+                continue;
+            }
         }
 
-        return [$year, $month, $day, $time];
-    }
-
-    private static function normalizeDate(string $date): string
-    {
-        return str_replace('/', '-', $date);
+        throw new InvalidFormatException();
     }
 
     public function toJalaliDateString(): string
@@ -139,16 +153,16 @@ class Jalali extends Carbon
         return $this->formatJalali($this->jYear, $this->jMonth, $this->jDay);
     }
 
-    private function updateJalali()
+    private function updateJalali(): void
     {
         [$jYear, $jMonth, $jDay] = CalendarUtils::g2j($this->year, $this->month, $this->day);
         $this->setJalaliDate($jYear, $jMonth, $jDay);
     }
 
-    private function formatJalali($year, $month, $day): string
+    private function formatJalali(int $year, int $month, int $day): string
     {
-        $month = str_pad($month, 2, '0', STR_PAD_LEFT);
-        $day = str_pad($day, 2, '0', STR_PAD_LEFT);
+        $month = str_pad((string)$month, 2, '0', STR_PAD_LEFT);
+        $day = str_pad((string)$day, 2, '0', STR_PAD_LEFT);
 
         return implode('/', [$year, $month, $day]);
     }
@@ -176,7 +190,7 @@ class Jalali extends Carbon
         return $this->addJalaliDays();
     }
 
-    public function addJalaliDays($days = 1): Jalali
+    public function addJalaliDays(int $days = 1): Jalali
     {
         parent::addDays($days);
         $this->updateJalali();
@@ -199,7 +213,7 @@ class Jalali extends Carbon
         while ($addMonths > 0) {
             $nextMonth = ($this->jMonth + 1) % 12;
             $nextMonthDayCount = CalendarUtils::getDayCount($this->jYear, $nextMonth === 0 ? 12 : $nextMonth);
-            $nextMonthDay = $this->jDay <= $nextMonthDayCount ? $this->jDay : $nextMonthDayCount;
+            $nextMonthDay = min($this->jDay, $nextMonthDayCount);
 
             $days = ($this->getMonthDays() - $this->jDay) + $nextMonthDay;
 
@@ -240,7 +254,7 @@ class Jalali extends Carbon
         return $this->subJalaliDays();
     }
 
-    public function subJalaliDays($days = 1): Jalali
+    public function subJalaliDays(int $days = 1): Jalali
     {
         parent::subDays($days);
         $this->updateJalali();
@@ -258,7 +272,7 @@ class Jalali extends Carbon
 
         if ($diff >= 1) {
             $dayCount = CalendarUtils::getDayCount($this->jYear, $diff);
-            $targetDay = $this->jDay <= $dayCount ? $this->jDay : $dayCount;
+            $targetDay = min($this->jDay, $dayCount);
             $this->setJalaliDate($this->jYear, $diff, $targetDay);
             return $this;
         }
