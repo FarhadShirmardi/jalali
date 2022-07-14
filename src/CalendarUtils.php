@@ -9,7 +9,16 @@ class CalendarUtils
     public const DaysOfMonthG = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     public const DaysOfMonthJ = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
 
-    public static function g2j($year, $month, $day): array
+    /**
+     *
+     * Converts gregorian year, month, day to jalali ones.
+     *
+     * @param int $year
+     * @param int $month
+     * @param int $day
+     * @return array
+     */
+    public static function g2j(int $year, int $month, int $day): array
     {
         $gYear = $year - 1600;
         $gMonth = $month - 1;
@@ -50,12 +59,23 @@ class CalendarUtils
         return [$jy, $jm, $jd];
     }
 
-    public static function div($a, $b): int
+    /**
+     * @param int $a
+     * @param int $b
+     * @return int
+     */
+    public static function div(int $a, int $b): int
     {
         return (int)($a / $b);
     }
 
-    public static function j2g($year, $month, $day): array
+    /**
+     * @param int|string $year
+     * @param int|string $month
+     * @param int|string $day
+     * @return array
+     */
+    public static function j2g(int|string $year, int|string $month, int|string $day): array
     {
         $jYear = (int)($year) - 979;
         $jMonth = (int)($month) - 1;
@@ -108,12 +128,21 @@ class CalendarUtils
         return [$gy, $gm, $gd];
     }
 
-    public static function getDayCount($year, $month): int
+    /**
+     * @param int $year
+     * @param int $month
+     * @return int
+     */
+    public static function getDayCount(int $year, int $month): int
     {
         return $month <= 6 ? 31 : ($month < 12 ? 30 : (self::isLeapYear($year) ? 30 : 29));
     }
 
-    public static function isLeapYear($year): bool
+    /**
+     * @param int $year
+     * @return bool
+     */
+    public static function isLeapYear(int $year): bool
     {
         if ($year > 0) {
             $y = $year - 474;
@@ -123,38 +152,36 @@ class CalendarUtils
         return ((((($y % 2820) + 474) + 38) * 682) % 2816) < 682;
     }
 
-    public static function getMonthName($month): string
+    /**
+     * @param int|string $month
+     * @return string
+     */
+    public static function getMonthName(int|string $month): string
     {
-        switch ((int)$month) {
-            case 1:
-                return 'فروردین';
-            case 2:
-                return 'اردیبهشت';
-            case 3:
-                return 'خرداد';
-            case 4:
-                return 'تیر';
-            case 5:
-                return 'مرداد';
-            case 6:
-                return 'شهریور';
-            case 7:
-                return 'مهر';
-            case 8:
-                return 'آبان';
-            case 9:
-                return 'آذر';
-            case 10:
-                return 'دی';
-            case 11:
-                return 'بهمن';
-            case 12:
-                return 'اسفند';
-        }
-        return '';
+        return match ((int)$month) {
+            1 => 'فروردین',
+            2 => 'اردیبهشت',
+            3 => 'خرداد',
+            4 => 'تیر',
+            5 => 'مرداد',
+            6 => 'شهریور',
+            7 => 'مهر',
+            8 => 'آبان',
+            9 => 'آذر',
+            10 => 'دی',
+            11 => 'بهمن',
+            12 => 'اسفند',
+            default => '',
+        };
     }
 
-    public static function checkdate($year, $month, $day): bool
+    /**
+     * @param int $year
+     * @param int $month
+     * @param int $day
+     * @return bool
+     */
+    public static function checkDate(int $year, int $month, int $day): bool
     {
         return $year >= 1 and $month >= 1 and $month <= 12
             and $day >= 1 and $day <= self::getDayCount($year, $month);
