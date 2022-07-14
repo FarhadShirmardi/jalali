@@ -13,15 +13,15 @@ final class JalaliTest extends TestCase
         $jDate = Jalali::parseJalali('1400/07/06');
         $this->assertEquals('2021-09-28', $jDate->toDateString());
 
-        $jDate = Jalali::parseJalali('1400/07/06 18');
+        $jDate = Jalali::parseJalali('1400/07/06 18', 'Y/m/d H');
         $this->assertEquals('2021-09-28', $jDate->toDateString());
         $this->assertEquals('2021-09-28 18:00:00', $jDate->toDateTimeString());
 
-        $jDate = Jalali::parseJalali('1400/07/06 18:34');
+        $jDate = Jalali::parseJalali('1400/07/06 18:34', 'Y/m/d H:i');
         $this->assertEquals('2021-09-28', $jDate->toDateString());
         $this->assertEquals('2021-09-28 18:34:00', $jDate->toDateTimeString());
 
-        $jDate = Jalali::parseJalali('1400/07/06 18:34:58');
+        $jDate = Jalali::parseJalali('1400/07/06 18:34:58', 'Y/m/d H:i:s');
         $this->assertEquals('2021-09-28', $jDate->toDateString());
         $this->assertEquals('2021-09-28 18:34:58', $jDate->toDateTimeString());
     }
