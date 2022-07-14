@@ -31,6 +31,11 @@
       "Derakht\\Jalali\\Tests\\": "tests/"
     }
   },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": false
+    }
+  },
   "extra": {
     "laravel": {
       "providers": [
