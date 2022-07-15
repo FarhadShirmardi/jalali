@@ -14,7 +14,6 @@ class Jalali extends Carbon
     public static function parseJalali(string $datetime, ?string $format = null): Jalali
     {
         [$year, $month, $day, $time] = self::parseFromFormat($datetime, $format);
-        [$gYear, $gMonth, $gDay] = CalendarUtils::j2g($year, $month, $day);
 
         if ($time) {
             $time = self::now()->setTimeFromTimeString($time);
@@ -22,9 +21,7 @@ class Jalali extends Carbon
             $time = self::now();
         }
 
-        return @static::now()
-            ->setJalaliDate($year, $month, $day)
-            ->setDate($gYear, $gMonth, $gDay)->setTimeFrom($time);
+        return static::now()->setJalaliDate($year, $month, $day)->setTimeFrom($time);
     }
 
     public static function parseFromFormat(string $date, ?string $format = null): array
@@ -118,11 +115,14 @@ class Jalali extends Carbon
 
     protected static function guessFormat(string $date): array
     {
-        $dateCollection = collect([
-            '',
-            'Y/m/d',
-            'Y-m-d',
-        ]);
+        $separator = ['/', '-'];
+        $dateCollection = collect([''])
+            ->merge(collect(['y', 'Y'])->crossJoin(
+                $separator,
+                ['m', 'n'],
+                $separator,
+                ['d', 'j']
+            )->map(fn($item) => trim(implode('', $item))));
 
         $timeCollection = collect([
             '',
