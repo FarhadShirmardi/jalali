@@ -23,6 +23,6 @@ Jalali::parse('2022-01-01')->toJalaliDateTimeString(); // 1400/10/11 00:00:00
 
 Jalali::parseJalali('1400/01/01')->toDateString(); // 2021-03-21
 Jalali::parseJalali('1400/01/01')->addDay()->toDateString(); // 2021-03-22
-
+Jalali::parseJalali('1400/06/31')->addJalaliMonth()->toJalaliDateString(); // 1400/07/30
 
 ```
