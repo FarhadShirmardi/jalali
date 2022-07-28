@@ -82,3 +82,7 @@ it('can sub jalali year')
     ->toBe('1399/06/31')
     ->and(Jalali::parseJalali('1399/12/30')->subJalaliYears(3)->toJalaliDateString())
     ->toBe('1396/12/29');
+
+it('can pass time format rule')
+    ->expect((new \Derakht\Jalali\Rules\JalaliRule('H:i'))->passes('', '13:10'))
+    ->toBeTrue();
