@@ -77,20 +77,24 @@ class Jalali extends Carbon
             }
         }
 
-        if (! $matched or ! CalendarUtils::checkDate($dt['year'], $dt['month'], $dt['day'])) {
+        if (! $matched) {
             throw new InvalidFormatException('Invalid date format!');
         }
 
-        if (strlen($dt['year']) == 2) {
-            $dt['year'] = substr((string)self::now()->jYear, 0, 2) . $dt['year'];
+        if ((isset($dt['year'], $dt['month'], $dt['day']) and ! CalendarUtils::checkDate($dt['year'], $dt['month'], $dt['day']))) {
+            throw new InvalidFormatException('Invalid date format!');
         }
 
-        $year = isset($dt['year']) ? (int)$dt['year'] : 0;
-        $month = isset($dt['month']) ? (int)$dt['month'] : 0;
-        $day = isset($dt['day']) ? (int)$dt['day'] : 0;
-        $hour = isset($dt['hour']) ? (int)$dt['hour'] : 0;
-        $minute = isset($dt['minute']) ? (int)$dt['minute'] : 0;
-        $second = isset($dt['second']) ? (int)$dt['second'] : 0;
+        if (isset($dt['year']) and strlen($dt['year']) == 2) {
+            $dt['year'] = substr((string) self::now()->jYear, 0, 2) . $dt['year'];
+        }
+
+        $year = isset($dt['year']) ? (int) $dt['year'] : 0;
+        $month = isset($dt['month']) ? (int) $dt['month'] : 0;
+        $day = isset($dt['day']) ? (int) $dt['day'] : 0;
+        $hour = isset($dt['hour']) ? (int) $dt['hour'] : 0;
+        $minute = isset($dt['minute']) ? (int) $dt['minute'] : 0;
+        $second = isset($dt['second']) ? (int) $dt['second'] : 0;
 
 
         return [$year, $month, $day, (new self)->setTime($hour, $minute, $second)->toTimeString()];
@@ -98,9 +102,9 @@ class Jalali extends Carbon
 
     public function setJalaliDate(int|string $jYear, int|string $jMonth, int|string $jDay): Jalali
     {
-        $this->jYear = (int)$jYear;
-        $this->jMonth = (int)$jMonth;
-        $this->jDay = (int)$jDay;
+        $this->jYear = (int) $jYear;
+        $this->jMonth = (int) $jMonth;
+        $this->jDay = (int) $jDay;
 
         $this->updateGregorian();
 
@@ -161,8 +165,8 @@ class Jalali extends Carbon
 
     private function formatJalali(int $year, int $month, int $day): string
     {
-        $month = str_pad((string)$month, 2, '0', STR_PAD_LEFT);
-        $day = str_pad((string)$day, 2, '0', STR_PAD_LEFT);
+        $month = str_pad((string) $month, 2, '0', STR_PAD_LEFT);
+        $day = str_pad((string) $day, 2, '0', STR_PAD_LEFT);
 
         return implode('/', [$year, $month, $day]);
     }
@@ -204,7 +208,7 @@ class Jalali extends Carbon
 
     public function addJalaliMonths(int $months = 1): Jalali
     {
-        $years = (int)($months / 12);
+        $years = (int) ($months / 12);
         $addMonths = $months % 12;
         if ($years > 0) {
             $this->addJalaliYears($years);
@@ -277,7 +281,7 @@ class Jalali extends Carbon
             return $this;
         }
 
-        $years = (int)(abs($diff) / 12);
+        $years = (int) (abs($diff) / 12);
         if ($years > 0) {
             $this->subJalaliYears($years);
         }
