@@ -157,7 +157,7 @@ class Jalali extends Carbon
         return $this->formatJalali($this->jYear, $this->jMonth, $this->jDay);
     }
 
-    private function updateJalali(): void
+    public function updateJalali(): void
     {
         [$jYear, $jMonth, $jDay] = CalendarUtils::g2j($this->year, $this->month, $this->day);
         $this->setJalaliDate($jYear, $jMonth, $jDay);
