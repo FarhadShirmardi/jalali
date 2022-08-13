@@ -144,12 +144,7 @@ class CalendarUtils
      */
     public static function isLeapYear(int $year): bool
     {
-        if ($year > 0) {
-            $y = $year - 474;
-        } else {
-            $y = 473;
-        }
-        return ((((($y % 2820) + 474) + 38) * 682) % 2816) < 682;
+        return in_array(($year % 33), [1, 5, 9, 13, 17, 22, 26, 30]);
     }
 
     /**

@@ -14,7 +14,9 @@ it('can check is leap year')
     ->expect(CalendarUtils::isLeapYear(1399))
     ->toBeTrue()
     ->and(CalendarUtils::isLeapYear(1400))
-    ->toBeFalse();
+    ->toBeFalse()
+    ->and(CalendarUtils::isLeapYear(1403))
+    ->toBeTrue();
 
 it('can check day count')
     ->expect(CalendarUtils::getDayCount(1400, 2))
