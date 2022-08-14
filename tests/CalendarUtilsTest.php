@@ -3,11 +3,11 @@
 use Derakht\Jalali\CalendarUtils;
 
 it('can convert gregorian to jalali')
-    ->expect(CalendarUtils::g2j(2021, 9, 28))
+    ->expect(CalendarUtils::gregorianToJalali(2021, 9, 28))
     ->toBe([1400, 7, 6]);
 
 it('can convert jalali to gregorian')
-    ->expect(CalendarUtils::j2g(1400, 7, 6))
+    ->expect(CalendarUtils::jalaliToGregorian(1400, 7, 6))
     ->toBe([2021, 9, 28]);
 
 it('can check is leap year')

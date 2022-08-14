@@ -113,7 +113,7 @@ class Jalali extends Carbon
 
     private function updateGregorian(): void
     {
-        [$gYear, $gMonth, $gDay] = CalendarUtils::j2g($this->jYear, $this->jMonth, $this->jDay);
+        [$gYear, $gMonth, $gDay] = CalendarUtils::jalaliToGregorian($this->jYear, $this->jMonth, $this->jDay);
         $this->setDate($gYear, $gMonth, $gDay);
     }
 
@@ -159,7 +159,7 @@ class Jalali extends Carbon
 
     public function updateJalali(): void
     {
-        [$jYear, $jMonth, $jDay] = CalendarUtils::g2j($this->year, $this->month, $this->day);
+        [$jYear, $jMonth, $jDay] = CalendarUtils::gregorianToJalali($this->year, $this->month, $this->day);
         $this->setJalaliDate($jYear, $jMonth, $jDay);
     }
 

@@ -18,7 +18,7 @@ class CalendarUtils
      * @param int $day
      * @return array
      */
-    public static function g2j(int $year, int $month, int $day): array
+    public static function gregorianToJalali(int $year, int $month, int $day): array
     {
         $gYear = $year - 1600;
         $gMonth = $month - 1;
@@ -75,11 +75,11 @@ class CalendarUtils
      * @param int|string $day
      * @return array
      */
-    public static function j2g(int|string $year, int|string $month, int|string $day): array
+    public static function jalaliToGregorian(int|string $year, int|string $month, int|string $day): array
     {
-        $jYear = (int)($year) - 979;
-        $jMonth = (int)($month) - 1;
-        $jDay = (int)($day) - 1;
+        $jYear = (int) ($year) - 979;
+        $jMonth = (int) ($month) - 1;
+        $jDay = (int) ($day) - 1;
 
         $jDayNo = 365 * $jYear + self::div($jYear, 33) * 8 + self::div($jYear % 33 + 3, 4);
 
@@ -144,7 +144,7 @@ class CalendarUtils
      */
     public static function isLeapYear(int $year): bool
     {
-        return in_array(($year % 33), [1, 5, 9, 13, 17, 22, 26, 30]);
+        return in_array(($year % 33), [1, 5, 9, 13, 17, 21, 26, 30]);
     }
 
     /**
