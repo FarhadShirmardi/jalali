@@ -10,13 +10,13 @@ it('can convert jalali to gregorian')
     ->expect(CalendarUtils::jalaliToGregorian(1400, 7, 6))
     ->toBe([2021, 9, 28]);
 
-it('can check is leap year')
-    ->expect(CalendarUtils::isLeapYear(1399))
-    ->toBeTrue()
-    ->and(CalendarUtils::isLeapYear(1400))
-    ->toBeFalse()
-    ->and(CalendarUtils::isLeapYear(1403))
-    ->toBeTrue();
+it('can check is leap year', function ($year) {
+    expect(CalendarUtils::isLeapYear($year))->toBeTrue();
+})->with([1399, 1403, 1408, 1412, 1441]);
+
+it('can check is not leap year', function ($year) {
+    expect(CalendarUtils::isLeapYear($year))->toBeFalse();
+})->with([1400, 1402, 1404, 1407, 1411]);
 
 it('can check day count')
     ->expect(CalendarUtils::getDayCount(1400, 2))
