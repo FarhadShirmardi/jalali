@@ -86,7 +86,10 @@ class Jalali extends Carbon
         }
 
         if (isset($dt['year']) and strlen($dt['year']) == 2) {
-            $dt['year'] = substr((string) self::now()->jYear, 0, 2) . $dt['year'];
+            $now = self::now();
+            $now->updateJalali();
+            $year = (int) substr((string) $now->jYear, 0, 2);
+            $dt['year'] = ($dt['year'] > 50 ? $year - 1 : $year).$dt['year'];
         }
 
         $year = isset($dt['year']) ? (int) $dt['year'] : 0;

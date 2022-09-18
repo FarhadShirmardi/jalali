@@ -1,6 +1,7 @@
 <?php
 
 use Derakht\Jalali\Jalali;
+use Derakht\Jalali\Rules\JalaliRule;
 
 it('can parse jalali format')
     ->expect(Jalali::parseJalali('1400/07/06')->toDateString())
@@ -16,7 +17,9 @@ it('can parse jalali format')
     ->and(Jalali::parseJalali('1400/07/06 18:34:58')->toDateString())
     ->toBe('2021-09-28')
     ->and(Jalali::parseJalali('1400/07/06 18:34:58')->toDateTimeString())
-    ->toBe('2021-09-28 18:34:58');
+    ->toBe('2021-09-28 18:34:58')
+    ->and(Jalali::parseJalali('99/12/29')->toDateString())
+    ->toBe('2021-03-19');
 
 it('can convert to jalali date string')
     ->expect(Jalali::parse('2021-09-28')->toJalaliDateString())
@@ -84,5 +87,5 @@ it('can sub jalali year')
     ->toBe('1396/12/29');
 
 it('can pass time format rule')
-    ->expect((new \Derakht\Jalali\Rules\JalaliRule('H:i'))->passes('', '13:10'))
+    ->expect((new JalaliRule('H:i'))->passes('', '13:10'))
     ->toBeTrue();
