@@ -11,8 +11,8 @@
   ],
   "require": {
     "php": "^8.0",
-    "illuminate/support": "^8.0|^9.0|^10.0",
-    "illuminate/validation": "^8.0|^9.0|^10.0",
+    "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+    "illuminate/validation": "^8.0|^9.0|^10.0|^11.0",
     "nesbot/carbon": ">=2.53"
   },
   "autoload": {
@@ -21,10 +21,8 @@
     }
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.5",
-    "orchestra/testbench": "^6.24|^7.5",
-    "pestphp/pest": "^1.21",
-    "nunomaduro/larastan": "2.0|^1.0.3"
+    "orchestra/testbench": "^6.24|^7.5|^9.0",
+    "pestphp/pest": "^2.0"
   },
   "autoload-dev": {
     "psr-4": {
