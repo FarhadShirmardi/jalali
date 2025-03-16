@@ -73,7 +73,6 @@ it('can sub jalali month')
     ->and(Jalali::parseJalali('1399/03/31')->subJalaliMonths(5)->toJalaliDateString())
     ->toBe('1398/10/30');
 
-
 it('can add jalali year')
     ->expect(Jalali::parseJalali('1400/06/31')->addJalaliYear()->toJalaliDateString())
     ->toBe('1401/06/31')
@@ -89,3 +88,34 @@ it('can sub jalali year')
 it('can pass time format rule')
     ->expect((new JalaliRule('H:i'))->passes('', '13:10'))
     ->toBeTrue();
+
+it('can go to start of month')
+    ->expect(Jalali::parseJalali('1403/11/11')->startOfJalaliMonth()->toJalaliDateTimeString())
+    ->toBe('1403/11/01 00:00:00')
+    ->and(Jalali::parseJalali('1403/06/11')->startOfJalaliMonth()->toJalaliDateString())
+    ->toBe('1403/06/01');
+
+it('can go to end of month')
+    ->expect(Jalali::parseJalali('1403/11/11')->endOfJalaliMonth()->toJalaliDateTimeString())
+    ->toBe('1403/11/30 23:59:59')
+    ->and(Jalali::parseJalali('1403/06/11')->endOfJalaliMonth()->toJalaliDateString())
+    ->toBe('1403/06/31')
+    ->and(Jalali::parseJalali('1403/12/11')->endOfJalaliMonth()->toJalaliDateString())
+    ->toBe('1403/12/30')
+    ->and(Jalali::parseJalali('1404/12/11')->endOfJalaliMonth()->toJalaliDateString())
+    ->toBe('1404/12/29');
+
+
+it('can go to start of year')
+    ->expect(Jalali::parseJalali('1403/11/11')->startOfJalaliYear()->toJalaliDateTimeString())
+    ->toBe('1403/01/01 00:00:00')
+    ->and(Jalali::parseJalali('1403/06/11')->startOfJalaliYear()->toJalaliDateString())
+    ->toBe('1403/01/01');
+
+it('can go to end of year')
+    ->expect(Jalali::parseJalali('1403/11/11')->endOfJalaliYear()->toJalaliDateTimeString())
+    ->toBe('1403/12/30 23:59:59')
+    ->and(Jalali::parseJalali('1403/06/11')->endOfJalaliYear()->toJalaliDateString())
+    ->toBe('1403/12/30')
+    ->and(Jalali::parseJalali('1404/12/11')->endOfJalaliYear()->toJalaliDateString())
+    ->toBe('1404/12/29');

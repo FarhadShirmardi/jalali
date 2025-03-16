@@ -4,11 +4,20 @@ namespace Derakht\Jalali;
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
+use Derakht\Jalali\Traits\Boundaries;
+use Derakht\Jalali\Traits\Converter;
+use Derakht\Jalali\Traits\Modifiers;
 
 class Jalali extends Carbon
 {
+    use Boundaries;
+    use Converter;
+    use Modifiers;
+
     public int $jYear;
+
     public int $jMonth;
+
     public int $jDay;
 
     public static function parseJalali(string $datetime, ?string $format = null): Jalali
@@ -54,11 +63,11 @@ class Jalali extends Carbon
         $chars = str_split($format);
         foreach ($chars as $n => $char) {
             $lastChar = $chars[$n - 1] ?? '';
-            $skipCurrent = '\\' == $lastChar;
+            $skipCurrent = $lastChar == '\\';
             if (! $skipCurrent && isset($keys[$char])) {
-                $regex .= '(?P<' . $keys[$char][0] . '>' . $keys[$char][1] . ')';
+                $regex .= '(?P<'.$keys[$char][0].'>'.$keys[$char][1].')';
             } else {
-                if ('\\' == $char) {
+                if ($char == '\\') {
                     $regex .= $char;
                 } else {
                     $regex .= preg_quote($char);
@@ -69,7 +78,7 @@ class Jalali extends Carbon
         $dt = [];
         $dt['error_count'] = 0;
         // now try to match it
-        if ($matched = preg_match('#^' . $regex . '$#', $date, $dt)) {
+        if ($matched = preg_match('#^'.$regex.'$#', $date, $dt)) {
             foreach ($dt as $k => $v) {
                 if (is_int($k)) {
                     unset($dt[$k]);
@@ -98,7 +107,6 @@ class Jalali extends Carbon
         $hour = isset($dt['hour']) ? (int) $dt['hour'] : 0;
         $minute = isset($dt['minute']) ? (int) $dt['minute'] : 0;
         $second = isset($dt['second']) ? (int) $dt['second'] : 0;
-
 
         return [$year, $month, $day, (new self)->setTime($hour, $minute, $second)->toTimeString()];
     }
@@ -129,7 +137,7 @@ class Jalali extends Carbon
                 ['m', 'n'],
                 $separator,
                 ['d', 'j']
-            )->map(fn($item) => trim(implode('', $item))));
+            )->map(fn ($item) => trim(implode('', $item))));
 
         $timeCollection = collect([
             '',
@@ -140,9 +148,9 @@ class Jalali extends Carbon
 
         $formats = $dateCollection
             ->crossJoin([' '], $timeCollection)
-            ->map(fn($item) => trim(implode('', $item)))
-            ->filter(fn($item) => $item !== '')
-            ->sortByDesc(fn($item) => strlen($item));
+            ->map(fn ($item) => trim(implode('', $item)))
+            ->filter(fn ($item) => $item !== '')
+            ->sortByDesc(fn ($item) => strlen($item));
         foreach ($formats as $format) {
             try {
                 return self::parseFromFormat($date, $format);
@@ -151,13 +159,7 @@ class Jalali extends Carbon
             }
         }
 
-        throw new InvalidFormatException();
-    }
-
-    public function toJalaliDateString(): string
-    {
-        $this->updateJalali();
-        return $this->formatJalali($this->jYear, $this->jMonth, $this->jDay);
+        throw new InvalidFormatException;
     }
 
     public function updateJalali(): void
@@ -166,149 +168,17 @@ class Jalali extends Carbon
         $this->setJalaliDate($jYear, $jMonth, $jDay);
     }
 
-    private function formatJalali(int $year, int $month, int $day): string
-    {
-        $month = str_pad((string) $month, 2, '0', STR_PAD_LEFT);
-        $day = str_pad((string) $day, 2, '0', STR_PAD_LEFT);
-
-        return implode('/', [$year, $month, $day]);
-    }
-
-    public function toJalaliDateTimeString(): string
-    {
-        $this->updateJalali();
-        return $this->formatJalali($this->jYear, $this->jMonth, $this->jDay) . ' ' . $this->toTimeString();
-    }
-
     public function getMonthName(): string
     {
         $this->updateJalali();
+
         return CalendarUtils::getMonthName($this->jMonth);
     }
 
     public function isJalaliLeapYear(): bool
     {
         $this->updateJalali();
+
         return CalendarUtils::isLeapYear($this->jYear);
-    }
-
-    public function addJalaliDay(): Jalali
-    {
-        return $this->addJalaliDays();
-    }
-
-    public function addJalaliDays(int $days = 1): Jalali
-    {
-        parent::addDays($days);
-        $this->updateJalali();
-        return $this;
-    }
-
-    public function addJalaliMonth(): Jalali
-    {
-        return $this->addJalaliMonths();
-    }
-
-    public function addJalaliMonths(int $months = 1): Jalali
-    {
-        $years = (int) ($months / 12);
-        $addMonths = $months % 12;
-        if ($years > 0) {
-            $this->addJalaliYears($years);
-        }
-
-        while ($addMonths > 0) {
-            $nextMonth = ($this->jMonth + 1) % 12;
-            $nextMonthDayCount = CalendarUtils::getDayCount($this->jYear, $nextMonth === 0 ? 12 : $nextMonth);
-            $nextMonthDay = min($this->jDay, $nextMonthDayCount);
-
-            $days = ($this->getMonthDays() - $this->jDay) + $nextMonthDay;
-
-            $this->addJalaliDays($days);
-            $addMonths--;
-        }
-
-        $this->updateGregorian();
-        return $this;
-    }
-
-    public function addJalaliYears(int $years = 1): Jalali
-    {
-        $this->jYear += $years;
-        if (CalendarUtils::isLeapYear($this->jYear) === false and
-            $this->jMonth === 12 and
-            $this->jDay > CalendarUtils::getDayCount($this->jYear, 12)
-        ) {
-            $this->jDay = 29;
-        }
-
-        $this->updateGregorian();
-        return $this;
-    }
-
-    public function getMonthDays(): int
-    {
-        return CalendarUtils::getDayCount($this->jYear, $this->jMonth);
-    }
-
-    public function addJalaliYear(): Jalali
-    {
-        return $this->addJalaliYears();
-    }
-
-    public function subJalaliDay(): Jalali
-    {
-        return $this->subJalaliDays();
-    }
-
-    public function subJalaliDays(int $days = 1): Jalali
-    {
-        parent::subDays($days);
-        $this->updateJalali();
-        return $this;
-    }
-
-    public function subJalaliMonth(): Jalali
-    {
-        return $this->subJalaliMonths();
-    }
-
-    public function subJalaliMonths(int $months = 1): Jalali
-    {
-        $diff = ($this->jMonth - $months);
-
-        if ($diff >= 1) {
-            $dayCount = CalendarUtils::getDayCount($this->jYear, $diff);
-            $targetDay = min($this->jDay, $dayCount);
-            $this->setJalaliDate($this->jYear, $diff, $targetDay);
-            return $this;
-        }
-
-        $years = (int) (abs($diff) / 12);
-        if ($years > 0) {
-            $this->subJalaliYears($years);
-        }
-        $diff = 12 - abs($diff % 12) - $this->jMonth;
-
-        return $diff > 0 ? $this->subJalaliYear()->addJalaliMonths($diff) : $this->subJalaliYear();
-    }
-
-    public function subJalaliYears(int $years = 1): Jalali
-    {
-        $this->jYear -= $years;
-        if (CalendarUtils::isLeapYear($this->jYear) === false and
-            $this->jMonth === 12 and
-            $this->jDay >= CalendarUtils::getDayCount($this->jYear, 12)
-        ) {
-            $this->jDay = 29;
-        }
-
-        $this->updateGregorian();
-        return $this;
-    }
-
-    public function subJalaliYear(): Jalali
-    {
-        return $this->subJalaliYears();
     }
 }
