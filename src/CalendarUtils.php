@@ -1,22 +1,15 @@
 <?php
 
-
 namespace Derakht\Jalali;
-
 
 class CalendarUtils
 {
     public const DaysOfMonthG = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
     public const DaysOfMonthJ = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
 
     /**
-     *
      * Converts gregorian year, month, day to jalali ones.
-     *
-     * @param int $year
-     * @param int $month
-     * @param int $day
-     * @return array
      */
     public static function gregorianToJalali(int $year, int $month, int $day): array
     {
@@ -27,7 +20,7 @@ class CalendarUtils
         $gDayNo =
             365 * $gYear + self::div($gYear + 3, 4) - self::div($gYear + 99, 100) + self::div($gYear + 399, 400);
 
-        for ($i = 0; $i < $gMonth; ++$i) {
+        for ($i = 0; $i < $gMonth; $i++) {
             $gDayNo += self::DaysOfMonthG[$i];
         }
         if ($gMonth > 1 && (($gYear % 4 == 0 && $gYear % 100 != 0) || ($gYear % 400 == 0))) {
@@ -50,7 +43,7 @@ class CalendarUtils
             $jDayNo = ($jDayNo - 1) % 365;
         }
 
-        for ($i = 0; $i < 11 && $jDayNo >= self::DaysOfMonthJ[$i]; ++$i) {
+        for ($i = 0; $i < 11 && $jDayNo >= self::DaysOfMonthJ[$i]; $i++) {
             $jDayNo -= self::DaysOfMonthJ[$i];
         }
         $jm = $i + 1;
@@ -59,22 +52,11 @@ class CalendarUtils
         return [$jy, $jm, $jd];
     }
 
-    /**
-     * @param int $a
-     * @param int $b
-     * @return int
-     */
     public static function div(int $a, int $b): int
     {
-        return (int)($a / $b);
+        return (int) ($a / $b);
     }
 
-    /**
-     * @param int|string $year
-     * @param int|string $month
-     * @param int|string $day
-     * @return array
-     */
     public static function jalaliToGregorian(int|string $year, int|string $month, int|string $day): array
     {
         $jYear = (int) ($year) - 979;
@@ -83,7 +65,7 @@ class CalendarUtils
 
         $jDayNo = 365 * $jYear + self::div($jYear, 33) * 8 + self::div($jYear % 33 + 3, 4);
 
-        for ($i = 0; $i < $jMonth; ++$i) {
+        for ($i = 0; $i < $jMonth; $i++) {
             $jDayNo += self::DaysOfMonthJ[$i];
         }
 
@@ -128,32 +110,19 @@ class CalendarUtils
         return [$gy, $gm, $gd];
     }
 
-    /**
-     * @param int $year
-     * @param int $month
-     * @return int
-     */
     public static function getDayCount(int $year, int $month): int
     {
         return $month <= 6 ? 31 : ($month < 12 ? 30 : (self::isLeapYear($year) ? 30 : 29));
     }
 
-    /**
-     * @param int $year
-     * @return bool
-     */
     public static function isLeapYear(int $year): bool
     {
         return in_array(($year % 33), [1, 5, 9, 13, 17, 22, 26, 30]);
     }
 
-    /**
-     * @param int|string $month
-     * @return string
-     */
     public static function getMonthName(int|string $month): string
     {
-        return match ((int)$month) {
+        return match ((int) $month) {
             1 => 'فروردین',
             2 => 'اردیبهشت',
             3 => 'خرداد',
@@ -170,12 +139,6 @@ class CalendarUtils
         };
     }
 
-    /**
-     * @param int $year
-     * @param int $month
-     * @param int $day
-     * @return bool
-     */
     public static function checkDate(int $year, int $month, int $day): bool
     {
         return $year >= 1 and $month >= 1 and $month <= 12

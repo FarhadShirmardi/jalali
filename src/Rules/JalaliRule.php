@@ -17,7 +17,7 @@ class JalaliRule implements Rule
 
     public function passes($attribute, $value): bool
     {
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 
